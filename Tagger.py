@@ -3,8 +3,8 @@ import streamlit as st
 import os
 
 # === Config ===
-MASTER_FILE = "./output/CSVS/final_image_metadata.csv"
-TAGGED_FILE = "./output/CSVS/tagged_data.csv"
+MASTER_FILE = "final_image_metadata.csv"
+TAGGED_FILE = "tagged_data.csv"
 
 # === Load master metadata ===
 df_master = pd.read_csv(MASTER_FILE)
