@@ -3,7 +3,7 @@ import streamlit as st
 import os
 
 # === Config ===
-MASTER_FILE = "final_image_metadata.csv"
+MASTER_FILE = "final_image_metadata_with_urls.csv"
 TAGGED_FILE = "tagged_data.csv"
 
 # === Load master metadata ===
