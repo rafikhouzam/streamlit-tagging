@@ -4,8 +4,15 @@ import os
 from streamlit import session_state
 
 # === Config ===
-MASTER_FILE = "final_image_metadata_with_urls.csv"
+MASTER_FILE = "metadata_1_8.csv"
 TAGGED_FILE = "tagged_data.csv"
+
+# Safe defaults in case the user is not tagging earrings
+earring_type = ""
+stud_subtype = ""
+setting = ""
+diameter = ""
+hoop_subtype = ""
 
 # === Load and cache shuffled master data ===
 if "df_master" not in st.session_state:
@@ -59,22 +66,91 @@ else:
     style_category = st.selectbox("Style Category", ["", "RING", "BRACELET", "EARRING", "NECKLACE", "PENDANT", "BANGLE", "ANKLET"],
         index=0 if pd.isna(row["style_category"]) else ["", "RING", "BRACELET", "EARRING", "NECKLACE", "PENDANT", "BANGLE", "ANKLET"].index(row["style_category"]),
         key=f"sc_{filename}")
+    
+    if style_category == "EARRING":
+        earring_type = st.selectbox(
+            "Earring Type",
+            ["", "Stud", "Hoop", "Fashion"],
+            key=f"et_{filename}"
+        )
 
-    ring_type = st.selectbox("Ring Type", ["", "BRIDAL", "ENGAGEMENT", "ANNIVERSARY", "FASHION", "GENTS", "WEDDING"],
-        index=0 if pd.isna(row["ring_type"]) else ["", "BRIDAL", "ENGAGEMENT", "ANNIVERSARY", "FASHION", "GENTS", "WEDDING"].index(row["ring_type"]) if row["ring_type"] in ["BRIDAL", "ENGAGEMENT", "ANNIVERSARY", "FASHION", "GENTS", "WEDDING"] else 0,
-        key=f"rt_{filename}")
+    # === Stud branch
+    if earring_type == "Stud":
+        stud_subtype = st.selectbox(
+            "Stud Subtype",
+            ["", "Cluster", "Solitaire", "Other"],
+            key=f"studtype_{filename}"
+        )
 
-    chain_type = st.selectbox("Chain Type", ["", "PAPER CLIP CHAIN", "ROPE CHAIN", "BOX CHAIN", "CUBAN LINK CHAIN", "BEAD CHAIN"],
-        index=0 if pd.isna(row["chain_type"]) else ["", "PAPER CLIP CHAIN", "ROPE CHAIN", "BOX CHAIN", "CUBAN LINK CHAIN", "BEAD CHAIN"].index(row["chain_type"]) if row["chain_type"] in ["PAPER CLIP CHAIN", "ROPE CHAIN", "BOX CHAIN", "CUBAN LINK CHAIN", "BEAD CHAIN"] else 0,
-        key=f"ct_{filename}")
+        setting = st.selectbox(
+            "Setting",
+            ["", "6-prong", "4-prong", "3-prong", "2-prong", "Bezel", "Invisible"],
+            key=f"setting_{filename}"
+        )
 
-    metal_color = st.selectbox("Metal Color", ["", "W", "Y", "R", "TT", "TRI"],
+    # === Hoop branch
+    elif earring_type == "Hoop":
+        diameter = st.select_slider(
+            "Hoop Diameter (inches)",
+            options=[round(x * 0.25, 2) for x in range(2, 9)],  # 0.5 to 2.0
+            key=f"diameter_{filename}"
+        )
+
+        hoop_subtype = st.selectbox(
+            "Hoop Subtype",
+            ["", "Huggie", "Inside Out", "Outside Only"],
+            key=f"hoopsub_{filename}"
+        )
+
+        # Optional: Smart assist for auto-classifying Huggie
+        if diameter <= 0.5 and hoop_subtype == "":
+            st.info("This may qualify as a Huggie due to small diameter.")
+
+
+    # === Fashion branch (currently no subfields)
+    elif earring_type == "Fashion":
+        st.write("No additional details for Fashion earrings (yet!)")
+
+
+    diamond_shape = st.selectbox(
+    "Diamond Shape",
+    [
+        "", "ROUND", "PRINCESS", "CUSHION", "OVAL", "EMERALD", "PEAR", "ASSCHER",
+        "KITE", "RADIANT", "MARQUISE", "ELONGATED CUSHION", "HALF MOON",
+        "TRILLIANT", "TAPERED BAGUETTE", "BAGUETTE"
+    ],
+    index=0 if pd.isna(row["cstone_shape"]) else [
+        "", "ROUND", "PRINCESS", "CUSHION", "OVAL", "EMERALD", "PEAR", "ASSCHER",
+        "KITE", "RADIANT", "MARQUISE", "ELONGATED CUSHION", "HALF MOON",
+        "TRILLIANT", "TAPERED BAGUETTE", "BAGUETTE"
+    ].index(row["cstone_shape"]) if row["cstone_shape"] in [
+        "ROUND", "PRINCESS", "CUSHION", "OVAL", "EMERALD", "PEAR", "ASSCHER",
+        "KITE", "RADIANT", "MARQUISE", "ELONGATED CUSHION", "HALF MOON",
+        "TRILLIANT", "TAPERED BAGUETTE", "BAGUETTE"
+    ] else 0,
+    key=f"ds_{filename}")
+
+    if style_category == "RING":
+        ring_type = st.selectbox("Ring Type", ["", "BRIDAL", "ENGAGEMENT", "ANNIVERSARY", "FASHION", "GENTS", "WEDDING"],
+            index=0 if pd.isna(row["ring_type"]) else ["", "BRIDAL", "ENGAGEMENT", "ANNIVERSARY", "FASHION", "GENTS", "WEDDING"].index(row["ring_type"]) if row["ring_type"] in ["BRIDAL", "ENGAGEMENT", "ANNIVERSARY", "FASHION", "GENTS", "WEDDING"] else 0,
+            key=f"rt_{filename}")
+        
+    if style_category == "NECKLACE" or style_category == "PENDANT" or style_category == "BRACELET":
+        chain_type = st.selectbox("Chain Type", ["", "PAPER CLIP CHAIN", "ROPE CHAIN", "BOX CHAIN", "CUBAN LINK CHAIN", "BEAD CHAIN"],
+            index=0 if pd.isna(row["chain_type"]) else ["", "PAPER CLIP CHAIN", "ROPE CHAIN", "BOX CHAIN", "CUBAN LINK CHAIN", "BEAD CHAIN"].index(row["chain_type"]) if row["chain_type"] in ["PAPER CLIP CHAIN", "ROPE CHAIN", "BOX CHAIN", "CUBAN LINK CHAIN", "BEAD CHAIN"] else 0,
+            key=f"ct_{filename}")
+
+    metal_color = st.selectbox("Metal Color", ["", "WHITE", "YELLOW", "ROSE GOLD", "TWO TONE", "TRICOLOR"],
         index=0 if pd.isna(row["metal_color"]) else ["", "W", "Y", "R", "TT", "TRI"].index(row["metal_color"]) if row["metal_color"] in ["W", "Y", "R", "TT", "TRI"] else 0,
         key=f"mc_{filename}")
 
     gender = st.selectbox("Gender", ["LADIES", "GENTS"],
         index=["LADIES", "GENTS"].index(row["gender"]) if pd.notna(row["gender"]) and row["gender"] in ["LADIES", "GENTS"] else 0,
         key=f"g_{filename}")
+    
+    collection = st.selectbox("Collection", ["", "Zodiac"],
+        index=0 if pd.isna(row.get("collection")) else ["", "Zodiac"].index(row["collection"]) if row["collection"] == "Zodiac" else 0,
+        key=f"coll_{filename}")
 
     is_set = st.checkbox("Is Set", value=bool(row["is_set"]), key=f"s_{filename}")
 
@@ -84,12 +160,20 @@ else:
             "filename": filename,
             "style_cd": style_cd,
             "style_category": style_category,
-            "ring_type": ring_type,
-            "chain_type": chain_type,
+            "cstone_shape": diamond_shape,
+            "ring_type": ring_type if style_category == "RING" else "",
+            "chain_type": chain_type if style_category in ["NECKLACE", "PENDANT", "BRACELET"] else "",
+            "earring_type": earring_type if style_category == "EARRING" else "",
             "metal_color": metal_color,
             "gender": gender,
-            "is_set": is_set
+            "collection": collection,
+            "is_set": is_set,
+            "stud_subtype": stud_subtype if earring_type == "Stud" else "",
+            "setting": setting if earring_type == "Stud" else "",
+            "diameter": diameter if earring_type == "Hoop" else "",
+            "hoop_subtype": hoop_subtype if earring_type == "Hoop" else ""
         }
+
 
         df_tagged = pd.concat([df_tagged, pd.DataFrame([new_row])], ignore_index=True)
         df_tagged.to_csv(TAGGED_FILE, index=False)
