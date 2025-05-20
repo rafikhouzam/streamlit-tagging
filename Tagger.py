@@ -3,6 +3,26 @@ import streamlit as st
 import os
 from streamlit import session_state
 
+# === Simple 4-digit code gate ===
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    codes = st.secrets["auth"]["pin_codes"]
+    code = st.text_input("Enter 4-digit Access Code", type="password")
+
+    if code:
+        if code in codes:
+            st.session_state.authenticated = True
+            st.rerun()
+        else:
+            st.error("Incorrect code. Please try again.")
+
+    st.stop()
+
+
+    
+        
 # === Config ===
 MASTER_FILE = "final_metadata_streamlit_ready.csv"
 TAGGED_FILE = "tagged_data_2.csv"
@@ -202,16 +222,22 @@ else:
 
     is_set = st.checkbox("Is Set", value=bool(row["is_set"]), key=f"s_{filename}")
 
+    comments = st.text_area("Comments / Notes", height=80, key=f"comments_{filename}")
+    cant_view_image = st.checkbox("⚠️ Image did not render / can’t be viewed", key=f"noview_{filename}")
+
     # === Save Tag ===
     if st.button("📂 Save", key=f"save_{filename}"):
         new_row = {
             "filename": filename,
+            "original_filename": filename,
+            "new_filename": new_filename.strip() if new_filename.strip() != filename else "",
+            "image_url": row["image_url"],
             "style_cd": style_cd,
             "style_category": style_category,
             "cstone_shape": ", ".join(cstone_shapes),
-            "ring_type": ring_type if style_category == "RING" else "N/A",
-            "chain_type": chain_type if style_category in ["NECKLACE", "PENDANT", "BRACELET"] else "N/A",
-            "earring_type": earring_type if style_category == "EARRING" else "N/A",
+            "ring_type": ring_type if style_category == "RING" else "",
+            "chain_type": chain_type if style_category in ["NECKLACE", "PENDANT", "BRACELET"] else "",
+            "earring_type": earring_type if style_category == "EARRING" else "",
             "metal_type": metal_type,
             "metal_color": metal_color,
             "collection": collection,
@@ -219,7 +245,9 @@ else:
             "is_set": is_set,
             "stud_subtype": stud_subtype if earring_type == "Stud" else "",
             "diameter": diameter if earring_type == "Hoop" else "",
-            "hoop_subtype": hoop_subtype if earring_type == "Hoop" else ""
+            "hoop_subtype": hoop_subtype if earring_type == "Hoop" else "",
+            "comments": comments,
+            "cant_view_image": cant_view_image
         }
 
 
