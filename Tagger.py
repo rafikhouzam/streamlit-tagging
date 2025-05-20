@@ -3,29 +3,28 @@ import streamlit as st
 import os
 from streamlit import session_state
 
-# === Simple 4-digit code gate ===
+# === Config ===
+MASTER_FILE = "final_metadata_streamlit_ready.csv"
+TAGGED_FILE = "tagged_data_2.csv"
+
+# === Tagger credentials (name: pin) ===
+TAGGERS = dict(st.secrets["taggers"])
+
+# === Auth ===
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-    codes = st.secrets["auth"]["pin_codes"]
-    code = st.text_input("Enter Access Code", type="password")
+    name = st.text_input("Your Name")
+    pin = st.text_input("4-digit PIN", type="password")
 
-    if code:
-        if code in codes:
-            st.session_state.authenticated = True
-            st.rerun()
-        else:
-            st.error("Incorrect code. Please try again.")
-
+    if name in TAGGERS and pin == TAGGERS[name]:
+        st.session_state.authenticated = True
+        st.session_state.tagger = name
+        st.rerun()
+    elif name and pin:
+        st.error("Invalid name or PIN")
     st.stop()
-
-
-    
-        
-# === Config ===
-MASTER_FILE = "final_metadata_streamlit_ready.csv"
-TAGGED_FILE = "tagged_data_2.csv"
 
 # === Load and cache shuffled master data ===
 if "df_master" not in st.session_state:
@@ -66,6 +65,20 @@ hoop_subtype = ""
 # === Initialize session state for current image ===
 if "current_filename" not in st.session_state and not df_unseen.empty:
     st.session_state.current_filename = df_unseen.iloc[0]["filename"]
+
+# === Leaderboard Sidebar ===
+st.sidebar.markdown("### 👥 Leaderboard")
+if not df_tagged.empty:
+    leaderboard = df_tagged["tagger"].value_counts().reset_index()
+    leaderboard.columns = ["Tagger", "Tags"]
+else:
+    # Show all taggers with 0 by default
+    leaderboard = pd.DataFrame({
+        "Tagger": list(TAGGERS.keys()),
+        "Tags": [0] * len(TAGGERS)
+    })
+
+st.sidebar.dataframe(leaderboard)
 
 # === End condition ===
 if df_unseen.empty:
