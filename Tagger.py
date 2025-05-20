@@ -9,7 +9,7 @@ if "authenticated" not in st.session_state:
 
 if not st.session_state.authenticated:
     codes = st.secrets["auth"]["pin_codes"]
-    code = st.text_input("Enter 4-digit Access Code", type="password")
+    code = st.text_input("Enter Access Code", type="password")
 
     if code:
         if code in codes:
