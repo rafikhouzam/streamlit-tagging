@@ -142,7 +142,7 @@ else:
 
     # === Collection ===
     collections = [
-        "None", "Constellation", "Zodiac / Horoscope", "Kaleioscope", "Flora", "Sphere", "Align",
+        "None", "Unknown", "Constellation", "Zodiac / Horoscope", "Kaleioscope", "Flora", "Sphere", "Align",
         "4 Stone Marquise", "Trinity Heart", "Tulip", "Spark of Love", "Dandelion", "Sinfonia",
         "Everlasting Love", "Love Bloom", "Where you belong…in my heart", "Petals of Love",
         "Angel Numbers", "Overlay", "Journey of you", "Celebration", "Unlock", "Mother and Child",
