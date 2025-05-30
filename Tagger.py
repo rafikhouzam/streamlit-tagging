@@ -5,7 +5,7 @@ from streamlit import session_state
 
 # === Config ===
 MASTER_FILE = "v2_metadata_with_image_url_3.csv"
-TAGGED_FILE = "tagged_data_3.csv"
+TAGGED_FILE = "tagged_data_4.csv"
 
 # === Tagger credentials (name: pin) ===
 TAGGERS = dict(st.secrets["taggers"])
@@ -38,7 +38,7 @@ else:
 tagged_columns = [
     "filename", "original_filename", "new_filename", "style_cd", "style_category", "ring_type", "cstone_shape",
     "chain_type", "metal_color", "metal_type", "gender", "collection", "is_set",
-    "earring_type", "stud_subtype", "setting", "diameter", "hoop_subtype", "image_url"
+    "earring_type", "stud_subtype", "setting", "diameter", "hoop_subtype", "image_url", "tagger"
 ]
 
 if os.path.exists(TAGGED_FILE) and os.path.getsize(TAGGED_FILE) > 0:
