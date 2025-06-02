@@ -38,7 +38,7 @@ else:
 tagged_columns = [
     "filename", "original_filename", "new_filename", "style_cd", "style_category", "ring_type", "cstone_shape",
     "chain_type", "metal_color", "metal_type", "gender", "collection", "is_set",
-    "earring_type", "stud_subtype", "setting", "diameter", "hoop_subtype", "image_url", "tagger"
+    "earring_type", "stud_subtype", "center_setting", "side_setting", "diameter", "hoop_subtype", "image_url", "tagger"
 ]
 
 if os.path.exists(TAGGED_FILE) and os.path.getsize(TAGGED_FILE) > 0:
@@ -90,8 +90,10 @@ else:
     
     style_cd = row["style_cd"]
     filename = row["filename"]
+    description = row["description"] if "description" in row else "No description available"
 
     st.write(f"**Current Style Code:** `{style_cd}`")
+    st.write(f"**Current Image Description:** {description}")
     st.write(f"**Current Filename:** `{filename}`")
     new_filename = st.text_input("Propose New Filename (optional)", value=filename, key=f"newname_{filename}")
 
@@ -104,9 +106,31 @@ else:
 
 
     # === Dropdowns ===
-    style_category = st.selectbox("Style Category", ["", "RING", "BRACELET", "EARRING", "NECKLACE", "PENDANT", "BANGLE", "ANKLET"],
-        index=0 if pd.isna(row["style_category"]) else ["", "RING", "BRACELET", "EARRING", "NECKLACE", "PENDANT", "BANGLE", "ANKLET"].index(row["style_category"]),
-        key=f"sc_{filename}")
+    view_options = ["", "SIDE", "FRONT/TOP", "3/4", "MODEL", "SCALE"]
+    default_view_idx = 0
+    if pd.notna(row.get("view")) and row["view"] in view_options:
+        default_view_idx = view_options.index(row["view"])
+
+    view = st.selectbox(
+        "View",
+        view_options,
+        index=default_view_idx,
+        key=f"view_{filename}"
+    )
+
+
+    style_options = ["", "RING", "BRACELET", "EARRING", "NECKLACE", "PENDANT", "BANGLE", "ANKLET"]
+    default_style_idx = 0
+    if pd.notna(row["style_category"]) and row["style_category"] in style_options:
+        default_style_idx = style_options.index(row["style_category"])
+
+    style_category = st.selectbox(
+        "Style Category",
+        style_options,
+        index=default_style_idx,
+        key=f"sc_{filename}"
+    )
+
 
     # === Metal Type ===
     metal_type = st.selectbox(
@@ -127,6 +151,7 @@ else:
     "Rose Gold": "R",
     "Two Tone": "T",
     "Tri Color": "3",
+    "Black Rhodium": "BR",
     "G": "G",
     "N": "N"
     }
@@ -198,11 +223,18 @@ else:
     elif earring_type == "Fashion":
         st.write("No additional details for Fashion earrings (yet!)")
 
-    setting = st.selectbox(
-            "Setting",
-            ["6-prong", "4-prong", "3-prong", "2-prong", "Bezel", "Invisible", "N/A"],
-            key=f"setting_{filename}"
+    center_setting = st.selectbox(
+            "Center Setting",
+            ["", "6-prong", "4-prong", "3-prong", "2-prong", "Bezel", "Invisible", "N/A"],
+            key=f"center_setting_{filename}"
         )
+    
+    side_setting = st.selectbox(
+            "Side Setting",
+            ["","6-prong", "4-prong", "3-prong", "2-prong", "Prong", "Channel", "Bezel", "Nick", "Invisible", "N/A"],
+            key=f"side_setting_{filename}"
+        )
+    
     
     diamond_shapes = [
     "ROUND", "PRINCESS", "CUSHION", "OVAL", "EMERALD", "PEAR", "ASSCHER",
@@ -223,9 +255,18 @@ else:
             key=f"rt_{filename}")
         
     if style_category == "NECKLACE" or style_category == "PENDANT" or style_category == "BRACELET":
-        chain_type = st.selectbox("Chain Type", ["", "PAPER CLIP CHAIN", "ROPE CHAIN", "BOX CHAIN", "CUBAN LINK CHAIN", "BEAD CHAIN"],
-            index=0 if pd.isna(row["chain_type"]) else ["", "PAPER CLIP CHAIN", "ROPE CHAIN", "BOX CHAIN", "CUBAN LINK CHAIN", "BEAD CHAIN"].index(row["chain_type"]) if row["chain_type"] in ["PAPER CLIP CHAIN", "ROPE CHAIN", "BOX CHAIN", "CUBAN LINK CHAIN", "BEAD CHAIN"] else 0,
-            key=f"ct_{filename}")
+        chain_options = ["", "BOX CHAIN", "BEAD CHAIN", "CABLE CHAIN", "CABLE-DC CHAIN", "CUBAN LINK CHAIN", "PAPER CLIP CHAIN", "ROPE CHAIN", "ROUND WHEAT CHAIN"]
+        default_idx = 0
+        if pd.notna(row["chain_type"]) and row["chain_type"] in chain_options:
+            default_idx = chain_options.index(row["chain_type"])
+
+        chain_type = st.selectbox(
+            "Chain Type",
+            chain_options,
+            index=default_idx,
+            key=f"ct_{filename}"
+        )
+
 
     gender = st.selectbox("Gender", ["LADIES", "GENTS"],
         index=["LADIES", "GENTS"].index(row["gender"]) if pd.notna(row["gender"]) and row["gender"] in ["LADIES", "GENTS"] else 0,
@@ -253,6 +294,8 @@ else:
             "earring_type": earring_type if style_category == "EARRING" else "",
             "metal_type": metal_type,
             "metal_color": metal_color,
+            "center_setting": center_setting,
+            "side_setting": side_setting,
             "collection": collection,
             "gender": gender,
             "is_set": is_set,
