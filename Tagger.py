@@ -287,6 +287,7 @@ else:
             "new_filename": new_filename.strip() if new_filename.strip() != filename else "",
             "image_url": row["image_url"],
             "style_cd": style_cd,
+            "view": view,
             "style_category": style_category,
             "cstone_shape": ", ".join(cstone_shapes),
             "ring_type": ring_type if style_category == "RING" else "",
