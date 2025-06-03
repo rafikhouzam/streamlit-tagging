@@ -4,4 +4,4 @@ final_image_metadata.csv
 metadata_1_8.csv
 tagged_data.csv
 /.streamlit
-*.csv
+v2_metadata_with_image_url_3.csv
