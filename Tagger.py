@@ -108,7 +108,7 @@ else:
     # === Dropdowns ===
     category_view_map = {
         "RING": ["","PRIMARY", "TOP", "FRONT", "3/4", "SIDE", "BACK", "MODEL", "SCALE"],
-        "BRACELET": ["","PRIMARY" "FULL", "CLASP", "O","MODEL", "SCALE"],
+        "BRACELET": ["","PRIMARY", "FULL", "CLASP", "O","MODEL", "SCALE"],
         "NECKLACE": ["", "FULL", "PRIMARY", "CLASP", "MODEL", "SCALE"],
         "EARRING": ["", "FRONT", "3/4", "SIDE", "BACK","MODEL", "SCALE"],
         "PENDANT": ["", "PRIMARY", "3/4", "SIDE", "BACK", "CLASP", "MODEL", "SCALE"],
