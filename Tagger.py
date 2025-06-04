@@ -106,7 +106,19 @@ else:
 
 
     # === Dropdowns ===
-    view_options = ["", "SIDE", "FRONT/TOP", "3/4", "MODEL", "SCALE"]
+    category_view_map = {
+        "RING": ["","PRIMARY", "TOP", "FRONT", "3/4", "SIDE", "BACK", "MODEL", "SCALE"],
+        "BRACELET": ["","PRIMARY" "FULL", "CLASP", "O","MODEL", "SCALE"],
+        "NECKLACE": ["", "FULL", "PRIMARY", "CLASP", "MODEL", "SCALE"],
+        "EARRING": ["", "FRONT", "3/4", "SIDE", "BACK","MODEL", "SCALE"],
+        "PENDANT": ["", "PRIMARY", "3/4", "SIDE", "BACK", "CLASP", "MODEL", "SCALE"],
+        "BANGLE": ["", "PRIMARY", "SIDE", "O" "MODEL", "SCALE"],
+        "ANKLET": ["","PRIMARY" "FULL", "CLASP", "O","MODEL", "SCALE"]
+    }
+
+    style_category_val = row.get("style_category", "")
+    view_options = category_view_map.get(style_category_val, ["", "FRONT", "SIDE", "MODEL", "SCALE"])
+
     default_view_idx = 0
     if pd.notna(row.get("view")) and row["view"] in view_options:
         default_view_idx = view_options.index(row["view"])
@@ -117,6 +129,7 @@ else:
         index=default_view_idx,
         key=f"view_{filename}"
     )
+
 
 
     style_options = ["", "RING", "BRACELET", "EARRING", "NECKLACE", "PENDANT", "BANGLE", "ANKLET"]
