@@ -110,7 +110,7 @@ else:
         "RING": ["","PRIMARY", "TOP", "FRONT", "3/4", "SIDE", "BACK", "MODEL", "SCALE"],
         "BRACELET": ["","PRIMARY", "FULL", "CLASP", "O","MODEL", "SCALE"],
         "NECKLACE": ["", "FULL", "PRIMARY", "CLASP", "MODEL", "SCALE"],
-        "EARRING": ["", "FRONT", "3/4", "SIDE", "BACK","MODEL", "SCALE"],
+        "EARRING": ["", "BACK", "FRONT", "3/4", "TOP", "TOP-3/4", "TOP-SIDE","SIDE", "MODEL", "SCALE", "MODEL-SCALE"],
         "PENDANT": ["", "PRIMARY", "3/4", "SIDE", "BACK", "CLASP", "MODEL", "SCALE"],
         "BANGLE": ["", "PRIMARY", "SIDE", "O" "MODEL", "SCALE"],
         "ANKLET": ["","PRIMARY" "FULL", "CLASP", "O","MODEL", "SCALE"]
