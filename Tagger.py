@@ -238,7 +238,7 @@ else:
 
     center_setting = st.selectbox(
             "Center Setting",
-            ["", "6-prong", "4-prong", "3-prong", "2-prong", "Bezel", "Invisible", "N/A"],
+            ["", "6-prong", "4-prong", "3-prong", "2-prong", "Channel", "Bezel", "Invisible", "Prong", "N/A"],
             key=f"center_setting_{filename}"
         )
     
