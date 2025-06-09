@@ -268,7 +268,7 @@ else:
             key=f"rt_{filename}")
         
     if style_category == "NECKLACE" or style_category == "PENDANT" or style_category == "BRACELET":
-        chain_options = ["", "BOX CHAIN", "BEAD CHAIN", "CABLE CHAIN", "CABLE-DC CHAIN", "CUBAN LINK CHAIN", "PAPER CLIP CHAIN", "ROPE CHAIN", "ROUND WHEAT CHAIN"]
+        chain_options = ["", "BOX CHAIN", "BEAD CHAIN", "CABLE CHAIN", "CABLE-DC CHAIN", "CUBAN LINK CHAIN", "CURB CHAIN", "HYDRO CHAIN","PAPER CLIP CHAIN", "ROLO CHAIN", "ROPE CHAIN", "ROUND WHEAT CHAIN"]
         default_idx = 0
         if pd.notna(row["chain_type"]) and row["chain_type"] in chain_options:
             default_idx = chain_options.index(row["chain_type"])
