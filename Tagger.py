@@ -107,7 +107,7 @@ else:
 
     # === Dropdowns ===
     category_view_map = {
-        "RING": ["","PRIMARY", "TOP", "FRONT", "3/4", "SIDE", "BACK", "MODEL", "SCALE"],
+        "RING": ["","PRIMARY", "TOP", "FRONT", "TOP-FRONT", "3/4", "SIDE", "BACK", "MODEL", "SCALE"],
         "BRACELET": ["","PRIMARY", "FULL", "CLASP", "O","MODEL", "SCALE"],
         "NECKLACE": ["", "FULL", "PRIMARY", "CLASP", "MODEL", "SCALE"],
         "EARRING": ["", "BACK", "FRONT", "3/4", "TOP", "TOP-3/4", "TOP-SIDE","SIDE", "MODEL", "SCALE", "MODEL-SCALE"],
@@ -238,7 +238,7 @@ else:
 
     center_setting = st.selectbox(
             "Center Setting",
-            ["", "6-prong", "4-prong", "3-prong", "2-prong", "Channel", "Bezel", "Invisible", "Prong", "N/A"],
+            ["", "6-prong", "5-Prong", "4-prong", "3-prong", "2-prong", "Channel", "Bezel", "Invisible", "Prong", "N/A"],
             key=f"center_setting_{filename}"
         )
     
