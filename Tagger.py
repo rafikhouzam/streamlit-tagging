@@ -250,7 +250,7 @@ else:
     
     
     diamond_shapes = [
-    "ROUND", "PRINCESS", "CUSHION", "OVAL", "EMERALD", "PEAR", "ASSCHER",
+    "ROUND", "PRINCESS", "CUSHION", "OVAL", "EMERALD", "PEAR", "HEART", "ASSCHER",
     "KITE", "RADIANT", "MARQUISE", "ELONGATED CUSHION", "HALF MOON",
     "TRILLIANT", "TAPERED BAGUETTE", "BAGUETTE"
     ]
