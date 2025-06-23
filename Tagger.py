@@ -46,6 +46,31 @@ if os.path.exists(TAGGED_FILE) and os.path.getsize(TAGGED_FILE) > 0:
 else:
     df_tagged = pd.DataFrame(columns=tagged_columns)
 
+import os
+from datetime import datetime
+
+def safe_save(df, path="tagged.csv"):
+    min_row_threshold = 20  # adjust as needed
+
+    if df.empty or len(df) < min_row_threshold:
+        st.error(f"❌ Save aborted: Only {len(df)} rows in memory. Abnormal state detected.")
+        return
+
+    # Save backup with timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    with open("save_log.txt", "a") as log:
+        log.write(f"[{timestamp}] Saved {len(df)} rows → {path}\n")
+
+    backup_path = f"backups/{os.path.basename(path).replace('.csv', f'_{timestamp}.csv')}"
+    os.makedirs("backups", exist_ok=True)
+    df.to_csv(backup_path, index=False)
+
+    # Save main file
+    df.to_csv(path, index=False)
+    st.success(f"✅ Saved {len(df)} rows to `{path}` + backup.")
+
+
 df_master["filename"] = df_master["image_url"].apply(lambda x: os.path.basename(str(x)))
 tagged_filenames = set(df_tagged["original_filename"])
 df_unseen = df_master[~df_master["filename"].isin(tagged_filenames)].reset_index(drop=True)
@@ -322,7 +347,7 @@ else:
 
 
         df_tagged = pd.concat([df_tagged, pd.DataFrame([new_row])], ignore_index=True)
-        df_tagged.to_csv(TAGGED_FILE, index=False)
+        safe_save(df_tagged, TAGGED_FILE)
 
         # Recalculate df_unseen and advance
         tagged_filenames = set(df_tagged["filename"])
