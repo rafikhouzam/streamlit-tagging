@@ -62,8 +62,8 @@ def safe_save(df, path="tagged.csv"):
     with open("save_log.txt", "a") as log:
         log.write(f"[{timestamp}] Saved {len(df)} rows → {path}\n")
 
-    backup_path = f"backups/{os.path.basename(path).replace('.csv', f'_{timestamp}.csv')}"
-    os.makedirs("backups", exist_ok=True)
+    backup_path = f"tagging_backups/{os.path.basename(path).replace('.csv', f'_{timestamp}.csv')}"
+    os.makedirs("tagging_backups", exist_ok=True)
     df.to_csv(backup_path, index=False)
 
     # Save main file
