@@ -5,7 +5,7 @@ from streamlit import session_state
 
 # === Config ===
 MASTER_FILE = "v2_metadata_with_image_url_3.csv"
-TAGGED_FILE = "tagged_data_6991.csv"
+TAGGED_FILE = "tagged_data_7650.csv"
 
 # === Tagger credentials (name: pin) ===
 TAGGERS = dict(st.secrets["taggers"])
@@ -319,6 +319,12 @@ else:
 
     # === Save Tag ===
     if st.button("📂 Save", key=f"save_{filename}"):
+        # Always reload the latest on-disk file
+        if os.path.exists(TAGGED_FILE) and os.path.getsize(TAGGED_FILE) > 0:
+            df_tagged = pd.read_csv(TAGGED_FILE)
+        else:
+            df_tagged = pd.DataFrame(columns=tagged_columns)
+
         new_row = {
             "filename": filename,
             "original_filename": filename,
