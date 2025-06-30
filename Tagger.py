@@ -5,7 +5,7 @@ from streamlit import session_state
 
 # === Config ===
 MASTER_FILE = "v2_metadata_with_image_url_3.csv"
-TAGGED_FILE = "tagged_data_8350.csv"
+TAGGED_FILE = "tagged_data_8500.csv"
 
 # === Tagger credentials (name: pin) ===
 TAGGERS = dict(st.secrets["taggers"])
@@ -90,20 +90,6 @@ hoop_subtype = ""
 # === Initialize session state for current image ===
 if "current_filename" not in st.session_state and not df_unseen.empty:
     st.session_state.current_filename = df_unseen.iloc[0]["filename"]
-
-# === Leaderboard Sidebar ===
-st.sidebar.markdown("### 👥 Leaderboard")
-if not df_tagged.empty:
-    leaderboard = df_tagged["tagger"].value_counts().reset_index()
-    leaderboard.columns = ["Tagger", "Tags"]
-else:
-    # Show all taggers with 0 by default
-    leaderboard = pd.DataFrame({
-        "Tagger": list(TAGGERS.keys()),
-        "Tags": [0] * len(TAGGERS)
-    })
-
-st.sidebar.dataframe(leaderboard)
 
 # === End condition ===
 if df_unseen.empty:
@@ -353,6 +339,7 @@ else:
 
 
         df_tagged = pd.concat([df_tagged, pd.DataFrame([new_row])], ignore_index=True)
+        df_tagged = df_tagged.drop_duplicates(subset="filename", keep="last")
         safe_save(df_tagged, TAGGED_FILE)
 
         # Recalculate df_unseen and advance
