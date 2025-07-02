@@ -5,7 +5,7 @@ from streamlit import session_state
 
 # === Config ===
 MASTER_FILE = "v2_metadata_with_image_url_3.csv"
-TAGGED_FILE = "tagged_data_10500.csv"
+TAGGED_FILE = "tagged_data_10522.csv"
 
 # === Tagger credentials (name: pin) ===
 TAGGERS = dict(st.secrets["taggers"])
@@ -48,27 +48,6 @@ else:
 
 import os
 from datetime import datetime
-
-def safe_save(df, path="tagged.csv"):
-    min_row_threshold = 20  # adjust as needed
-
-    if df.empty or len(df) < min_row_threshold:
-        st.error(f"❌ Save aborted: Only {len(df)} rows in memory. Abnormal state detected.")
-        return
-
-    # Save backup with timestamp
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    
-    with open("save_log.txt", "a") as log:
-        log.write(f"[{timestamp}] Saved {len(df)} rows → {path}\n")
-
-    backup_path = f"tagging_backups/{os.path.basename(path).replace('.csv', f'_{timestamp}.csv')}"
-    os.makedirs("tagging_backups", exist_ok=True)
-    df.to_csv(backup_path, index=False)
-
-    # Save main file
-    df.to_csv(path, index=False)
-    st.success(f"✅ Saved {len(df)} rows to `{path}` + backup.")
 
 
 df_master["filename"] = df_master["image_url"].apply(lambda x: os.path.basename(str(x)))
@@ -304,8 +283,12 @@ else:
     cant_view_image = st.checkbox("⚠️ Image did not render / can’t be viewed", key=f"noview_{filename}")
 
     # === Save Tag ===
+    # === Save Tag ===
     if st.button("📂 Save", key=f"save_{filename}"):
-        # Always reload the latest on-disk file
+        import os
+        from datetime import datetime
+
+        # Reload latest from disk
         if os.path.exists(TAGGED_FILE) and os.path.getsize(TAGGED_FILE) > 0:
             df_tagged = pd.read_csv(TAGGED_FILE)
         else:
@@ -334,15 +317,27 @@ else:
             "diameter": diameter if earring_type == "Hoop" else "",
             "hoop_subtype": hoop_subtype if earring_type == "Hoop" else "",
             "comments": comments,
-            "cant_view_image": cant_view_image
+            "cant_view_image": cant_view_image,
+            "tagger": st.session_state.tagger
         }
-
 
         df_tagged = pd.concat([df_tagged, pd.DataFrame([new_row])], ignore_index=True)
         df_tagged = df_tagged.drop_duplicates(subset="filename", keep="last")
-        safe_save(df_tagged, TAGGED_FILE)
 
-        # Recalculate df_unseen and advance
+        # ✅ Always create a backup BEFORE save
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        os.makedirs("tagging_backups", exist_ok=True)
+        backup_path = f"tagging_backups/{os.path.basename(TAGGED_FILE).replace('.csv', f'_{timestamp}.csv')}"
+        df_tagged.to_csv(backup_path, index=False)
+
+        # ✅ Write to main file
+        df_tagged.to_csv(TAGGED_FILE, index=False)
+
+        # ✅ Optional: save log
+        with open("save_log.txt", "a") as log:
+            log.write(f"[{timestamp}] Saved {len(df_tagged)} rows → {TAGGED_FILE} + backup {backup_path}\n")
+
+        # ✅ Recompute unseen
         tagged_filenames = set(df_tagged["filename"])
         df_unseen = df_master[~df_master["filename"].isin(tagged_filenames)].reset_index(drop=True)
 
@@ -351,4 +346,6 @@ else:
         else:
             del st.session_state["current_filename"]
 
+        st.success(f"✅ Saved {len(df_tagged)} rows. Backup created.")
         st.rerun()
+
