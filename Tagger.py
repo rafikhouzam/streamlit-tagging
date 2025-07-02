@@ -5,7 +5,7 @@ from streamlit import session_state
 
 # === Config ===
 MASTER_FILE = "v2_metadata_with_image_url_3.csv"
-TAGGED_FILE = "tagged_data_10522.csv"
+TAGGED_FILE = "tagged_data_11000.csv"
 
 # === Tagger credentials (name: pin) ===
 TAGGERS = dict(st.secrets["taggers"])
