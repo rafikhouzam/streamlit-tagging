@@ -2,10 +2,12 @@ import pandas as pd
 import streamlit as st
 import os
 from streamlit import session_state
+from datetime import datetime
+from utils.recovery import auto_recover_csv
 
 # === Config ===
 MASTER_FILE = "v2_metadata_with_image_url_3.csv"
-TAGGED_FILE = "tagged_data_11900.csv"
+TAGGED_FILE = "tagged_data_11876.csv"
 
 # === Tagger credentials (name: pin) ===
 TAGGERS = dict(st.secrets["taggers"])
@@ -41,14 +43,7 @@ tagged_columns = [
     "earring_type", "stud_subtype", "center_setting", "side_setting", "diameter", "hoop_subtype", "image_url", "tagger"
 ]
 
-if os.path.exists(TAGGED_FILE) and os.path.getsize(TAGGED_FILE) > 0:
-    df_tagged = pd.read_csv(TAGGED_FILE)
-else:
-    df_tagged = pd.DataFrame(columns=tagged_columns)
-
-import os
-from datetime import datetime
-
+df_tagged = auto_recover_csv(TAGGED_FILE, "tagging_backups")
 
 df_master["filename"] = df_master["image_url"].apply(lambda x: os.path.basename(str(x)))
 tagged_filenames = set(df_tagged["original_filename"])
