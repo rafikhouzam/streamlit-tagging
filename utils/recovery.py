@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from datetime import datetime
 
-def auto_recover_csv(main_path, backup_dir, recovery_log="recovery_log.txt", threshold=50, scan_limit=100):
+def auto_recover_csv(main_path, backup_dir, recovery_log="recovery_log.txt", threshold=50, scan_limit=5):
     def count_rows(path):
         try:
             return pd.read_csv(path).shape[0]

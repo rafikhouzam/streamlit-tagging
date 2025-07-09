@@ -10,3 +10,6 @@ backups/*
 save_log.txt
 tagging_backups/*
 *.csv
+recovery_log.txt
+*.pyc
+__pycache__/

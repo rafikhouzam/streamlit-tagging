@@ -30,7 +30,7 @@ if not st.session_state.authenticated:
 
 # === Load and cache shuffled master data ===
 if "df_master" not in st.session_state:
-    df_master = pd.read_csv(MASTER_FILE)
+    df_master = pd.read_csv(MASTER_FILE, dtype=str)
     df_master = df_master.sample(frac=1).reset_index(drop=True)
     st.session_state.df_master = df_master
 else:
@@ -62,14 +62,24 @@ diameter = ""
 hoop_subtype = ""
 
 # === Initialize session state for current image ===
-if "current_filename" not in st.session_state and not df_unseen.empty:
+if not st.session_state.get("current_filename") and not df_unseen.empty:
     st.session_state.current_filename = df_unseen.iloc[0]["filename"]
 
 # === End condition ===
 if df_unseen.empty:
     st.success("🎉 All images have been tagged!")
 else:
-    row = df_unseen[df_unseen["filename"] == st.session_state.current_filename].iloc[0]
+    current_filename = st.session_state.get("current_filename")
+    if not current_filename or current_filename not in df_unseen["filename"].values:
+        if not df_unseen.empty:
+            st.session_state.current_filename = df_unseen.iloc[0]["filename"]
+            current_filename = st.session_state.current_filename
+        else:
+            st.success("🎉 All images have been tagged!")
+            st.stop()
+
+    row = df_unseen[df_unseen["filename"] == current_filename].iloc[0]
+
     st.image(row["image_url"], width=300)
 
     
