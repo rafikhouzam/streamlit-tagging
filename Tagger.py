@@ -6,8 +6,8 @@ from datetime import datetime
 from utils.recovery import auto_recover_csv
 
 # === Config ===
-MASTER_FILE = "v2_metadata_with_image_url_3.csv"
-TAGGED_FILE = "tagged_data_11876.csv"
+MASTER_FILE = "final_tagged_with_metadata_v2.csv"
+TAGGED_FILE = "tagged_data_rerun.csv"
 
 # === Tagger credentials (name: pin) ===
 TAGGERS = dict(st.secrets["taggers"])
@@ -38,10 +38,12 @@ else:
 
 # === Load or initialize tagged data ===
 tagged_columns = [
-    "filename", "original_filename", "new_filename", "style_cd", "style_category", "ring_type", "cstone_shape",
-    "chain_type", "metal_color", "metal_type", "gender", "collection", "is_set",
-    "earring_type", "stud_subtype", "center_setting", "side_setting", "diameter", "hoop_subtype", "image_url", "tagger"
+    "filename", "original_filename", "new_filename", "style_cd", "style_category", "ring_type", 
+    "diamond_options", "center_stone_shape", "chain_type", "metal_color", "metal_type", "gender",
+    "collection", "is_set", "earring_type", "stud_subtype", "center_setting", "side_setting",
+    "diameter", "hoop_subtype", "image_url", "tagger"
 ]
+
 
 df_tagged = auto_recover_csv(TAGGED_FILE, "tagging_backups")
 
@@ -127,7 +129,7 @@ else:
 
 
 
-    style_options = ["", "RING", "BRACELET", "EARRING", "NECKLACE", "PENDANT", "BANGLE", "ANKLET"]
+    style_options = ["", "RING", "BRACELET", "EARRING", "NECKLACE","CHARM", "SET (MX)", "PENDANT", "BANGLE", "ANKLET"]
     default_style_idx = 0
     if pd.notna(row["style_category"]) and row["style_category"] in style_options:
         default_style_idx = style_options.index(row["style_category"])
@@ -244,18 +246,25 @@ else:
         )
     
     
-    diamond_shapes = [
-    "ROUND", "PRINCESS", "CUSHION", "OVAL", "EMERALD", "PEAR", "HEART", "ASSCHER",
+    diamond_options = [
+    "", "ROUND", "PRINCESS", "CUSHION", "OVAL", "EMERALD", "PEAR", "HEART", "ASSCHER",
     "KITE", "RADIANT", "MARQUISE", "ELONGATED CUSHION", "HALF MOON",
     "TRILLIANT", "TAPERED BAGUETTE", "BAGUETTE"
     ]
 
     cstone_shapes = st.multiselect(
-    "Center Stone Shape(s)",
-    options=diamond_shapes,
-    default=[row["cstone_shape"]] if pd.notna(row.get("cstone_shape")) and row["cstone_shape"] in diamond_shapes else [],
+    "Diamond Shape(s)",
+    options=diamond_options,
+    default=[row["cstone_shape"]] if pd.notna(row.get("cstone_shape")) and row["cstone_shape"] in diamond_options else [],
     key=f"css_{filename}"
 )
+    center_stone_shape = ""
+    if cstone_shapes:
+        center_stone_shape = st.selectbox(
+            "Center Stone Shape (single)",
+            options=diamond_options,
+            key=f"center_single_{filename}"
+        )
 
     if style_category == "RING":
         ring_type = st.selectbox("Ring Type", ["", "BRIDAL", "ENGAGEMENT", "ANNIVERSARY", "FASHION", "GENTS", "WEDDING"],
@@ -307,7 +316,8 @@ else:
             "style_cd": style_cd,
             "view": view,
             "style_category": style_category,
-            "cstone_shape": ", ".join(cstone_shapes),
+            "diamond_shapes": ", ".join(cstone_shapes),
+            "center_stone_shape": cstone_shapes[0] if cstone_shapes else "",
             "ring_type": ring_type if style_category == "RING" else "",
             "chain_type": chain_type if style_category in ["NECKLACE", "PENDANT", "BRACELET"] else "",
             "earring_type": earring_type if style_category == "EARRING" else "",
